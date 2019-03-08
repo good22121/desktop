@@ -97,6 +97,18 @@ function renderAheadBehind(
   return <div className="ahead-behind">{content}</div>
 }
 
+function renderLastFetched(lastFetched: Date | null): JSX.Element | string {
+  if (lastFetched) {
+    return (
+      <span>
+        Last fetched <RelativeTime date={lastFetched} />
+      </span>
+    )
+  } else {
+    return 'Never fetched'
+  }
+}
+
 function progressButton(
   progress: Progress,
   networkActionInProgress: boolean,
@@ -194,21 +206,38 @@ function fetchButton(
   onClick: () => void
 ) {
   const title = `Fetch ${remoteName}`
-
-  const description = lastFetched ? (
-    <span>
-      Last fetched <RelativeTime date={lastFetched} />
-    </span>
-  ) : (
-    'Never fetched'
+  return (
+    <ToolbarButton
+      title={title}
+      description={renderLastFetched(lastFetched)}
+      className="push-pull-button"
+      icon={OcticonSymbol.sync}
+      style={ToolbarButtonStyle.Subtitle}
+      onClick={onClick}
+    >
+      {renderAheadBehind(null, aheadBehind)}
+    </ToolbarButton>
   )
+}
+
+function pullButton(
+  remoteName: string,
+  aheadBehind: IAheadBehind,
+  lastFetched: Date | null,
+  pullWithRebase: boolean,
+  onClick: () => void
+) {
+  const title =
+    pullWithRebase && enablePullWithRebase()
+      ? `Pull ${remoteName} with rebase`
+      : `Pull ${remoteName}`
 
   return (
     <ToolbarButton
       title={title}
-      description={description}
+      description={renderLastFetched(lastFetched)}
       className="push-pull-button"
-      icon={OcticonSymbol.sync}
+      icon={OcticonSymbol.arrowDown}
       style={ToolbarButtonStyle.Subtitle}
       onClick={onClick}
     >
@@ -230,6 +259,10 @@ export class PushPullButton extends React.Component<IPushPullButtonProps, {}> {
     this.props.dispatcher.push(this.props.repository)
   }
 
+  private pull = () => {
+    this.props.dispatcher.pull(this.props.repository)
+  }
+
   private fetch = () => {
     this.props.dispatcher.fetch(
       this.props.repository,
@@ -247,6 +280,7 @@ export class PushPullButton extends React.Component<IPushPullButtonProps, {}> {
       tipState,
       rebaseInProgress,
       lastFetched,
+      pullWithRebase,
     } = this.props
 
     if (progress !== null) {
@@ -274,6 +308,16 @@ export class PushPullButton extends React.Component<IPushPullButtonProps, {}> {
 
     if (ahead === 0 && behind === 0) {
       return fetchButton(remoteName, aheadBehind, lastFetched, this.fetch)
+    }
+
+    if (behind > 0) {
+      return pullButton(
+        remoteName,
+        aheadBehind,
+        lastFetched,
+        pullWithRebase || false,
+        this.pull
+      )
     }
 
     const title = this.getTitle()
