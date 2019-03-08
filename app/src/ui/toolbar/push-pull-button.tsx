@@ -250,12 +250,34 @@ function isBranchRebased(branchWasRebased: boolean, aheadBehind: IAheadBehind) {
   return branchWasRebased && aheadBehind.behind > 0 && aheadBehind.ahead > 0
 }
 
+function pushButton(
+  remoteName: string,
+  aheadBehind: IAheadBehind,
+  lastFetched: Date | null,
+  onClick: () => void
+) {
+  const title = `Push ${remoteName}`
+
+  return (
+    <ToolbarButton
+      title={title}
+      description={renderLastFetched(lastFetched)}
+      className="push-pull-button"
+      icon={OcticonSymbol.arrowUp}
+      style={ToolbarButtonStyle.Subtitle}
+      onClick={onClick}
+    >
+      {renderAheadBehind(null, aheadBehind)}
+    </ToolbarButton>
+  )
+}
+
 /**
  * A button which pushes, pulls, or updates depending on the state of the
  * repository.
  */
 export class PushPullButton extends React.Component<IPushPullButtonProps, {}> {
-  private publish = () => {
+  private push = () => {
     this.props.dispatcher.push(this.props.repository)
   }
 
@@ -288,7 +310,7 @@ export class PushPullButton extends React.Component<IPushPullButtonProps, {}> {
     }
 
     if (remoteName === null) {
-      return publishRepositoryButton(this.publish)
+      return publishRepositoryButton(this.push)
     }
 
     if (tipState === TipState.Unborn) {
@@ -301,7 +323,7 @@ export class PushPullButton extends React.Component<IPushPullButtonProps, {}> {
 
     if (aheadBehind === null) {
       const isGitHub = !!repository.gitHubRepository
-      return publishBranchButton(isGitHub, this.publish)
+      return publishBranchButton(isGitHub, this.push)
     }
 
     const { ahead, behind } = aheadBehind
@@ -319,6 +341,8 @@ export class PushPullButton extends React.Component<IPushPullButtonProps, {}> {
         this.pull
       )
     }
+
+    return pushButton(remoteName, aheadBehind, lastFetched, this.push)
 
     const title = this.getTitle()
     const description = this.getDescription(this.props.tipState)
