@@ -62,6 +62,63 @@ const forcePushIcon = new OcticonSymbol(
   'M3 11H0l5-6 5 6H7v4H3v-4zM5 1l5 6H8.33L5 3 1.662 7H0l5-6z'
 )
 
+function renderAheadBehind(
+  progress: Progress | null,
+  aheadBehind: IAheadBehind | null
+) {
+  if (!aheadBehind || progress) {
+    return null
+  }
+
+  const { ahead, behind } = aheadBehind
+  if (ahead === 0 && behind === 0) {
+    return null
+  }
+
+  const content: JSX.Element[] = []
+  if (ahead > 0) {
+    content.push(
+      <span key="ahead">
+        {ahead}
+        <Octicon symbol={OcticonSymbol.arrowSmallUp} />
+      </span>
+    )
+  }
+
+  if (behind > 0) {
+    content.push(
+      <span key="behind">
+        {behind}
+        <Octicon symbol={OcticonSymbol.arrowSmallDown} />
+      </span>
+    )
+  }
+
+  return <div className="ahead-behind">{content}</div>
+}
+
+function renderProgressButton(
+  progress: Progress,
+  networkActionInProgress: boolean,
+  aheadBehind: IAheadBehind | null
+) {
+  return (
+    <ToolbarButton
+      title={progress.title}
+      description={progress.description || 'Hang on…'}
+      progressValue={progress.value}
+      className="push-pull-button"
+      icon={OcticonSymbol.sync}
+      iconClassName={networkActionInProgress ? 'spin' : ''}
+      style={ToolbarButtonStyle.Subtitle}
+      tooltip={progress ? progress.description : undefined}
+      disabled={true}
+    >
+      {renderAheadBehind(progress, aheadBehind)}
+    </ToolbarButton>
+  )
+}
+
 function getActionLabel(
   aheadBehind: IAheadBehind,
   remoteName: string,
