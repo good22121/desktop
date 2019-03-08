@@ -66,7 +66,7 @@ function renderAheadBehind(
   progress: Progress | null,
   aheadBehind: IAheadBehind | null
 ) {
-  if (!aheadBehind || progress) {
+  if (aheadBehind === null || progress !== null) {
     return null
   }
 
@@ -140,9 +140,7 @@ function publishRepositoryButton(onClick: () => void) {
       icon={OcticonSymbol.cloudUpload}
       style={ToolbarButtonStyle.Subtitle}
       onClick={onClick}
-    >
-      {renderAheadBehind(null, null)}
-    </ToolbarButton>
+    />
   )
 }
 
@@ -155,9 +153,7 @@ function unbornRepositoryButton() {
       icon={OcticonSymbol.cloudUpload}
       style={ToolbarButtonStyle.Subtitle}
       disabled={true}
-    >
-      {renderAheadBehind(null, null)}
-    </ToolbarButton>
+    />
   )
 }
 
@@ -174,9 +170,7 @@ function detachedHeadButton(rebaseInProgress: boolean) {
       icon={OcticonSymbol.cloudUpload}
       style={ToolbarButtonStyle.Subtitle}
       disabled={true}
-    >
-      {renderAheadBehind(null, null)}
-    </ToolbarButton>
+    />
   )
 }
 
@@ -193,9 +187,7 @@ function publishBranchButton(isGitHub: boolean, onClick: () => void) {
       icon={OcticonSymbol.cloudUpload}
       style={ToolbarButtonStyle.Subtitle}
       onClick={onClick}
-    >
-      {renderAheadBehind(null, null)}
-    </ToolbarButton>
+    />
   )
 }
 
