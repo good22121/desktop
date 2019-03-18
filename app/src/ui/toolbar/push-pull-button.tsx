@@ -62,14 +62,7 @@ const forcePushIcon = new OcticonSymbol(
   'M3 11H0l5-6 5 6H7v4H3v-4zM5 1l5 6H8.33L5 3 1.662 7H0l5-6z'
 )
 
-function renderAheadBehind(
-  progress: Progress | null,
-  aheadBehind: IAheadBehind | null
-) {
-  if (aheadBehind === null || progress !== null) {
-    return null
-  }
-
+function renderAheadBehind(aheadBehind: IAheadBehind) {
   const { ahead, behind } = aheadBehind
   if (ahead === 0 && behind === 0) {
     return null
@@ -109,11 +102,7 @@ function renderLastFetched(lastFetched: Date | null): JSX.Element | string {
   }
 }
 
-function progressButton(
-  progress: Progress,
-  networkActionInProgress: boolean,
-  aheadBehind: IAheadBehind | null
-) {
+function progressButton(progress: Progress, networkActionInProgress: boolean) {
   return (
     <ToolbarButton
       title={progress.title}
@@ -125,9 +114,7 @@ function progressButton(
       style={ToolbarButtonStyle.Subtitle}
       tooltip={progress ? progress.description : undefined}
       disabled={true}
-    >
-      {renderAheadBehind(progress, aheadBehind)}
-    </ToolbarButton>
+    />
   )
 }
 
@@ -207,7 +194,7 @@ function fetchButton(
       style={ToolbarButtonStyle.Subtitle}
       onClick={onClick}
     >
-      {renderAheadBehind(null, aheadBehind)}
+      {renderAheadBehind(aheadBehind)}
     </ToolbarButton>
   )
 }
@@ -233,7 +220,7 @@ function pullButton(
       style={ToolbarButtonStyle.Subtitle}
       onClick={onClick}
     >
-      {renderAheadBehind(null, aheadBehind)}
+      {renderAheadBehind(aheadBehind)}
     </ToolbarButton>
   )
 }
@@ -245,21 +232,25 @@ function isBranchRebased(branchWasRebased: boolean, aheadBehind: IAheadBehind) {
 function pushButton(
   remoteName: string,
   aheadBehind: IAheadBehind,
+  isBranchRebased: boolean,
   lastFetched: Date | null,
   onClick: () => void
 ) {
-  const title = `Push ${remoteName}`
+  const title = isBranchRebased
+    ? `Force push ${remoteName}`
+    : `Push ${remoteName}`
+  const icon = isBranchRebased ? forcePushIcon : OcticonSymbol.arrowUp
 
   return (
     <ToolbarButton
       title={title}
       description={renderLastFetched(lastFetched)}
       className="push-pull-button"
-      icon={OcticonSymbol.arrowUp}
+      icon={icon}
       style={ToolbarButtonStyle.Subtitle}
       onClick={onClick}
     >
-      {renderAheadBehind(null, aheadBehind)}
+      {renderAheadBehind(aheadBehind)}
     </ToolbarButton>
   )
 }
@@ -298,7 +289,7 @@ export class PushPullButton extends React.Component<IPushPullButtonProps, {}> {
     } = this.props
 
     if (progress !== null) {
-      return progressButton(progress, networkActionInProgress, aheadBehind)
+      return progressButton(progress, networkActionInProgress)
     }
 
     if (remoteName === null) {
