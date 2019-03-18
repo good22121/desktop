@@ -286,6 +286,7 @@ export class PushPullButton extends React.Component<IPushPullButtonProps, {}> {
       rebaseInProgress,
       lastFetched,
       pullWithRebase,
+      branchWasRebased,
     } = this.props
 
     if (progress !== null) {
@@ -325,6 +326,14 @@ export class PushPullButton extends React.Component<IPushPullButtonProps, {}> {
       )
     }
 
-    return pushButton(remoteName, aheadBehind, lastFetched, this.push)
+    const branchIsRebased = isBranchRebased(branchWasRebased, aheadBehind)
+
+    return pushButton(
+      remoteName,
+      aheadBehind,
+      branchIsRebased,
+      lastFetched,
+      this.push
+    )
   }
 }
