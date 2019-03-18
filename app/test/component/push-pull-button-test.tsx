@@ -102,6 +102,8 @@ describe('<PushPullButton/>', () => {
       lastFetched: null,
       tipState: TipState.Valid,
       rebaseInProgress: false,
+      // TODO: add tests for this scenario
+      branchWasRebased: false,
       repository,
     }
   })
